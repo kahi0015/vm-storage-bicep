@@ -20,7 +20,7 @@ az resource list --resource-group cst8912lab10-RG
 - Install Node.js:
 
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -sudo apt-get install -y nodejs
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs
 ```
 
 - Upload project to the VM (SCP or git clone)
@@ -34,7 +34,8 @@ git init
 git remote add origin https://github.com/kahi0015/vm-storage-bicep.git
 git add .
 git commit -m "Initial commit"
-git push -u origin main
+git branch -M main
+git push -u origin main --force
 ```
 
 - Run:
