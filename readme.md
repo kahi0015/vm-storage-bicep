@@ -15,7 +15,7 @@ az deployment group create --resource-group cst8912lab10-RG --template-file main
 az resource list --resource-group cst8912lab10-RG
 ```
 
-- Upload a few blobs/files to the container
+- Upload a few blobs (files) to the container
 - SSH into the VM
 - Install Node.js:
 

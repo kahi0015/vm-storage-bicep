@@ -135,6 +135,52 @@ resource storageContainer 'Microsoft.Storage/storageAccounts/blobServices/contai
   }
 }
 
+// Log Analytics Workspace
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' = {
+  name: '${resourcePrefix}-law'
+  location: location
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+    retentionInDays: 30
+  }
+}
+
+// Diagnostic Settings for Storage Account
+resource storageAccountDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${storageAccountName}-diagnostics'
+  scope: storageAccount
+  properties: {
+    workspaceId: logAnalyticsWorkspace.id
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'Transaction'
+        enabled: true
+      }
+    ]
+  }
+}
+
+// VM Extension for Azure Monitor Agent (optional)
+resource azureMonitorAgent 'Microsoft.Compute/virtualMachines/extensions@2024-11-01' = {
+  name: 'AzureMonitorLinuxAgent'
+  parent: virtualMachine
+  location: location
+  properties: {
+    publisher: 'Microsoft.Azure.Monitor'
+    type: 'AzureMonitorLinuxAgent'
+    typeHandlerVersion: '1.35.8'
+    autoUpgradeMinorVersion: true
+  }
+}
+
 // Virtual Machine
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2024-11-01' = {
   name: vmName
@@ -180,3 +226,5 @@ output vmPublicIpAddress string = publicIp.properties.ipAddress
 output storageAccountName string = storageAccount.name
 // output storageAccountConnectionString string = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
 output sshCommand string = 'ssh ${adminUsername}@${publicIp.properties.ipAddress}'
+output logAnalyticsWorkspaceId string = logAnalyticsWorkspace.id
+output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.name
